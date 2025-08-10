@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOTAM AI Processor - Microsoft Copilot Integration</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="header-left">
+                        <h1 class="app-title">NOTAM AI Processor</h1>
+                        <span class="app-subtitle">Microsoft Copilot Integration</span>
+                    </div>
+                    <div class="header-right">
+                        <div class="connection-status" id="connectionStatus">
+                            <span class="status-indicator offline" id="statusIndicator"></span>
+                            <span class="status-text">Microsoft Copilot: Disconnected</span>
+                        </div>
+                        <button class="btn btn--outline" id="connectButton">
+                            Connect to Microsoft Copilot
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <div class="content-grid">
+                    <!-- Left Column: NOTAM Processing -->
+                    <div class="processing-section">
+                        <!-- NOTAM Input -->
+                        <div class="card">
+                            <div class="card__header">
+                                <h2>NOTAM Processing Interface</h2>
+                                <p class="section-description">Paste raw NOTAM data for AI processing with Microsoft Copilot</p>
+                            </div>
+                            <div class="card__body">
+                                <div class="form-group">
+                                    <label for="notam-input" class="form-label">NOTAM Data Input</label>
+                                    <textarea 
+                                        id="notam-input" 
+                                        class="form-control notam-input" 
+                                        placeholder="Paste raw NOTAM text here..."
+                                        rows="8"
+                                    ></textarea>
+                                </div>
+                                
+                                <div class="processing-controls">
+                                    <button class="btn btn--primary btn--lg" id="processButton" disabled>
+                                        <span class="button-icon">🤖</span>
+                                        Process with Microsoft Copilot
+                                    </button>
+                                    <button class="btn btn--outline" id="clearButton">
+                                        Clear Input
+                                    </button>
+                                </div>
+
+                                <!-- Processing Status -->
+                                <div class="processing-status hidden" id="processingStatus">
+                                    <div class="status-indicator">
+                                        <div class="loading-spinner"></div>
+                                        <span class="status-text">Processing with Microsoft Copilot...</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI Output Display -->
+                        <div class="results-section hidden" id="resultsSection">
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>AI Processing Results</h3>
+                                    <div class="results-meta">
+                                        <span class="confidence-score" id="confidenceScore">Confidence: 0%</span>
+                                        <span class="processing-time" id="processingTime">0ms</span>
+                                    </div>
+                                </div>
+                                <div class="card__body">
+                                    <div class="parsed-results" id="parsedResults">
+                                        <!-- AI processed results will appear here -->
+                                    </div>
+                                    
+                                    <!-- Correction interface appears when confidence is low -->
+                                    <div class="correction-interface hidden" id="correctionInterface">
+                                        <div class="correction-header">
+                                            <h4>Expected Output</h4>
+                                            <p>The AI confidence is low. Please provide the correct parsing below:</p>
+                                        </div>
+                                        
+                                        <div class="correction-form">
+                                            <div class="form-row">
+                                                <div class="form-group">
+                                                    <label for="expectedAirway" class="form-label">Airway</label>
+                                                    <input type="text" id="expectedAirway" class="form-control" placeholder="e.g., B208">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="expectedStatus" class="form-label">Status</label>
+                                                    <select id="expectedStatus" class="form-control">
+                                                        <option value="">Select status</option>
+                                                        <option value="CLOSED">CLOSED</option>
+                                                        <option value="OPEN">OPEN</option>
+                                                        <option value="RESTRICTED">RESTRICTED</option>
+                                                        <option value="ACTIVE">ACTIVE</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="expectedRoute" class="form-label">Route</label>
+                                                <input type="text" id="expectedRoute" class="form-control" placeholder="e.g., HOHHOT VOR (HET) - NIXAL">
+                                            </div>
+                                            
+                                            <div class="form-row">
+                                                <div class="form-group">
+                                                    <label for="expectedAltitude" class="form-label">Altitude</label>
+                                                    <input type="text" id="expectedAltitude" class="form-control" placeholder="e.g., 7800M AND BELOW">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="expectedPriority" class="form-label">Priority</label>
+                                                    <select id="expectedPriority" class="form-control">
+                                                        <option value="">Select priority</option>
+                                                        <option value="CRITICAL">CRITICAL</option>
+                                                        <option value="HIGH">HIGH</option>
+                                                        <option value="MEDIUM">MEDIUM</option>
+                                                        <option value="LOW">LOW</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="correction-actions">
+                                                <button class="btn btn--primary" id="storeCorrectionButton">
+                                                    Store Correction
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Live Learning Dashboard -->
+                    <div class="dashboard-section">
+                        <!-- Live Learning Dashboard -->
+                        <div class="card">
+                            <div class="card__header">
+                                <h3>Live Learning Dashboard</h3>
+                                <span class="live-indicator">🟢 Live Updates</span>
+                            </div>
+                            <div class="card__body">
+                                <div class="stats-grid">
+                                    <div class="stat-item">
+                                        <span class="stat-value" id="totalProcessed">0</span>
+                                        <span class="stat-label">Total NOTAMs Processed</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-value" id="correctionsStored">0</span>
+                                        <span class="stat-label">Corrections Stored</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-value" id="accuracyImprovement">+0.0%</span>
+                                        <span class="stat-label">Accuracy Improvement</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-value" id="datasetSize">0</span>
+                                        <span class="stat-label">Dataset Size</span>
+                                    </div>
+                                </div>
+
+                                <!-- Accuracy Trend Chart -->
+                                <div class="chart-section">
+                                    <h4>Learning Progress</h4>
+                                    <div class="chart-container" style="position: relative; height: 200px;">
+                                        <canvas id="learningChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connection Status & Info -->
+                        <div class="card">
+                            <div class="card__header">
+                                <h3>Microsoft Copilot Status</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="connection-details">
+                                    <div class="connection-item">
+                                        <span class="connection-label">User Account</span>
+                                        <span class="connection-value" id="userAccount">Not Connected</span>
+                                    </div>
+                                    <div class="connection-item">
+                                        <span class="connection-label">API Status</span>
+                                        <span class="connection-value" id="apiStatus">Offline</span>
+                                    </div>
+                                    <div class="connection-item">
+                                        <span class="connection-label">Last Process</span>
+                                        <span class="connection-value" id="lastProcess">Never</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="auth-info">
+                                    <p class="auth-description">
+                                        Connect to Microsoft Copilot to enable AI-powered NOTAM processing with expert learning capabilities.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="card">
+                            <div class="card__header">
+                                <h3>Recent Activity</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="activity-feed" id="activityFeed">
+                                    <div class="activity-item">
+                                        <span class="activity-time">Ready to start</span>
+                                        <span class="activity-text">System initialized</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Success Notification -->
+    <div class="notification hidden" id="notification">
+        <div class="notification-content">
+            <span class="notification-icon">✅</span>
+            <span class="notification-text"></span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
